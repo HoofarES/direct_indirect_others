@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spanish Pronouns Practice</title>
+<style>
+:root{
+  --bg:#f5f7fb; --card:#fff; --ink:#15202b; --muted:#617081; --line:#d9e1ea;
+  --accent:#2457ff; --good:#198754; --bad:#c93b3b; --pill:#eef3ff;
+}
+*{box-sizing:border-box}
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  text-align:center;
+  margin:0;
+  padding:20px;
+}
+.wrap{max-width:980px;margin:0 auto}
+h1{margin:0 0 8px;font-size:32px}
+h2{margin-top:0}
+.lead{color:var(--muted);margin:0 0 18px}
+.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+button{
+  border:1px solid var(--line);
+  background:white;
+  border-radius:12px;
+  padding:12px 16px;
+  margin:5px;
+  font-size:16px;
+  cursor:pointer;
+}
+button.active, button.primary{
+  background:var(--accent);
+  color:white;
+  border-color:var(--accent);
+}
+button:disabled{opacity:.65;cursor:not-allowed}
+.card{
+  background:var(--card);
+  max-width:860px;
+  margin:auto;
+  padding:28px 20px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  box-shadow:0 8px 24px rgba(20,40,80,.06);
+}
+.hidden{display:none}
+.question{
+  font-size:29px;
+  line-height:1.28;
+  margin:22px 0;
+}
+.context{
+  font-size:21px;
+  line-height:1.3;
+  margin:8px 0;
+  color:var(--muted);
+}
+.translationPrompt{
+  font-size:27px;
+  line-height:1.3;
+  margin:18px 0 6px;
+}
+.spanishGap{
+  font-size:31px;
+  line-height:1.3;
+  margin:10px 0 22px;
+  font-weight:700;
+}
+.meta{color:var(--muted);font-size:15px;margin-top:8px}
+.options{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:18px auto 0;
+  max-width:760px;
+}
+.options.three{grid-template-columns:1fr 1fr 1fr}
+.options.four{grid-template-columns:repeat(4,1fr)}
+.options.six{grid-template-columns:repeat(3,1fr)}
+.option{
+  min-height:62px;
+  font-size:21px;
+}
+.feedback{
+  font-size:22px;
+  margin-top:15px;
+  min-height:34px;
+  font-weight:bold;
+}
+.good{color:var(--good)}
+.bad{color:var(--bad)}
+.stats{color:var(--muted);margin-top:10px}
+.controls{margin-top:16px}
+.rulebox{
+  background:var(--pill);
+  border:1px solid #d8e2ff;
+  border-radius:14px;
+  padding:14px 16px;
+  margin:12px auto 18px;
+  max-width:760px;
+  text-align:left;
+  color:#243b7a;
+}
+.rulebox p{margin:6px 0}
+.rulebox code{
+  background:#fff;
+  padding:2px 5px;
+  border-radius:6px;
+  font-size:15px;
+}
+@media(max-width:760px){
+  .options,.options.three,.options.four,.options.six{grid-template-columns:1fr}
+  .question,.translationPrompt{font-size:24px}
+  .spanishGap{font-size:26px}
+  .option{font-size:20px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Spanish Pronouns Practice</h1>
+  <p class="lead">Indirect pronouns, direct pronouns, double pronouns and infinitive structures.</p>
+
+  <div class="tabs">
+    <button id="tabPronouns" class="active" onclick="showTab('pronouns')">1. Indirect</button>
+    <button id="tabVerbPronouns" onclick="showTab('verbPronouns')">2. Indirect + verbs</button>
+    <button id="tabTranslate" onclick="showTab('translate')">3. Translate indirect</button>
+    <button id="tabDirect" onclick="showTab('direct')">4. Direct</button>
+    <button id="tabDouble" onclick="showTab('double')">5. Double pronouns</button>
+    <button id="tabInfinitive" onclick="showTab('infinitive')">6. Infinitives</button>
+  </div>
+
+  <div id="pronouns" class="card">
+    <h2>Indirect Object Pronouns</h2>
+    <p class="meta">Choose: me, te, le, nos, os, les.</p>
+    <div id="pronounQuestion" class="question"></div>
+    <div id="pronounOptions" class="options six"></div>
+    <div id="pronounFeedback" class="feedback"></div>
+    <div id="pronounStats" class="stats">Score: 0 / 0</div>
+    <div class="controls">
+      <button class="primary" onclick="nextPronoun()">Next</button>
+      <button onclick="resetPronouns()">Reset score</button>
+    </div>
+  </div>
+
+  <div id="verbPronouns" class="card hidden">
+    <h2>Verb Forms with Indirect Pronouns</h2>
+    <p class="meta">Choose the correct verb form. Present, pretérito perfecto and ir a + infinitive.</p>
+    <div id="verbPronounLabel" class="meta"></div>
+    <div id="verbPronounQuestion" class="question"></div>
+    <div id="verbPronounOptions" class="options three"></div>
+    <div id="verbPronounFeedback" class="feedback"></div>
+    <div id="verbPronounStats" class="stats">Score: 0 / 0</div>
+    <div class="controls">
+      <button class="primary" onclick="nextVerbPronoun()">Next</button>
+      <button onclick="resetVerbPronouns()">Reset score</button>
+    </div>
+  </div>
+
+  <div id="translate" class="card hidden">
+    <h2>Translate from English: Indirect Pronouns</h2>
+    <p class="meta">Choose the two missing parts. The options show: pronoun / verb form.</p>
+    <div id="translateLabel" class="meta"></div>
+    <div id="translatePrompt" class="translationPrompt"></div>
+    <div id="translateGap" class="spanishGap"></div>
+    <div id="translateOptions" class="options"></div>
+    <div id="translateFeedback" class="feedback"></div>
+    <div id="translateStats" class="stats">Score: 0 / 0</div>
+    <div class="controls">
+      <button class="primary" onclick="nextTranslate()">Next</button>
+      <button onclick="resetTranslate()">Reset score</button>
+    </div>
+  </div>
+
+  <div id="direct" class="card hidden">
+    <h2>Direct Object Pronouns</h2>
+    <p class="meta">Choose: lo, la, los, las. Look at the object, then complete the sentence.</p>
+    <div id="directContext" class="context"></div>
+    <div id="directQuestion" class="question"></div>
+    <div id="directOptions" class="options four"></div>
+    <div id="directFeedback" class="feedback"></div>
+    <div id="directStats" class="stats">Score: 0 / 0</div>
+    <div class="controls">
+      <button class="primary" onclick="nextDirect()">Next</button>
+      <button onclick="resetDirect()">Reset score</button>
+    </div>
+  </div>
+
+  <div id="double" class="card hidden">
+    <h2>Double Pronouns: Simple Verbs</h2>
+    <div class="rulebox">
+      <p><strong>Rule 1:</strong> If there are two pronouns, the <strong>indirect pronoun goes first</strong>: <code>me lo</code>, <code>te la</code>, <code>nos los</code>.</p>
+      <p><strong>Rule 2:</strong> <code>le/les + lo/la/los/las</code> changes to <code>se lo</code>, <code>se la</code>, <code>se los</code>, <code>se las</code>.</p>
+      <p>Example: <em>Doy el libro a Juan</em> → <strong>Se lo doy</strong>.</p>
+    </div>
+    <p class="meta">Choose the two pronouns. Options show: indirect / direct.</p>
+    <div id="doublePrompt" class="translationPrompt"></div>
+    <div id="doubleGap" class="spanishGap"></div>
+    <div id="doubleOptions" class="options"></div>
+    <div id="doubleFeedback" class="feedback"></div>
+    <div id="doubleStats" class="stats">Score: 0 / 0</div>
+    <div class="controls">
+      <button class="primary" onclick="nextDouble()">Next</button>
+      <button onclick="resetDouble()">Reset score</button>
+    </div>
+  </div>
+
+  <div id="infinitive" class="card hidden">
+    <h2>Double Pronouns with Infinitives</h2>
+    <p class="meta">Use one attached infinitive form: comprárselo, decírtelo, explicárnoslo, etc.</p>
+    <div id="infinitiveLabel" class="meta"></div>
+    <div id="infinitivePrompt" class="translationPrompt"></div>
+    <div id="infinitiveGap" class="spanishGap"></div>
+    <div id="infinitiveOptions" class="options"></div>
+    <div id="infinitiveFeedback" class="feedback"></div>
+    <div id="infinitiveStats" class="stats">Score: 0 / 0</div>
+    <div class="controls">
+      <button class="primary" onclick="nextInfinitive()">Next</button>
+      <button onclick="resetInfinitive()">Reset score</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function shuffle(arr){
+  const copy=[...arr];
+  for(let i=copy.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [copy[i],copy[j]]=[copy[j],copy[i]];
+  }
+  return copy;
+}
+
+function pickNextIndex(data, lastIndex){
+  let available = data.map((_, i) => i).filter(i => i !== lastIndex);
+  if (!available.length) available = data.map((_, i) => i);
+  return available[Math.floor(Math.random()*available.length)];
+}
+
+function showTab(tab){
+  const ids=['pronouns','verbPronouns','translate','direct','double','infinitive'];
+  ids.forEach(id => document.getElementById(id).classList.toggle('hidden', tab !== id));
+
+  document.getElementById('tabPronouns').classList.toggle('active', tab === 'pronouns');
+  document.getElementById('tabVerbPronouns').classList.toggle('active', tab === 'verbPronouns');
+  document.getElementById('tabTranslate').classList.toggle('active', tab === 'translate');
+  document.getElementById('tabDirect').classList.toggle('active', tab === 'direct');
+  document.getElementById('tabDouble').classList.toggle('active', tab === 'double');
+  document.getElementById('tabInfinitive').classList.toggle('active', tab === 'infinitive');
+
+  if(tab === 'pronouns') nextPronoun();
+  if(tab === 'verbPronouns') nextVerbPronoun();
+  if(tab === 'translate') nextTranslate();
+  if(tab === 'direct') nextDirect();
+  if(tab === 'double') nextDouble();
+  if(tab === 'infinitive') nextInfinitive();
+}
+
+/* ---------------- GENERIC MCQ HELPERS ---------------- */
+
+function renderOptions(containerId, options, checkFn, extraClass='option'){
+  const wrap=document.getElementById(containerId);
+  wrap.innerHTML='';
+  shuffle(options).forEach(opt=>{
+    const btn=document.createElement('button');
+    btn.className=extraClass;
+    btn.textContent=opt;
+    btn.onclick=()=>checkFn(opt);
+    wrap.appendChild(btn);
+  });
+}
+
+function disableOptions(containerSelector){
+  Array.from(document.querySelectorAll(containerSelector + ' .option')).forEach(b=>b.disabled=true);
+}
+
+/* ---------------- TAB 1: INDIRECT PRONOUNS ---------------- */
+
+const pronounData=[
+  {cue:"a mí", sentence:"___ preparan una pizza.", answer:"me", full:"Me preparan una pizza."},
+  {cue:"a ti", sentence:"___ cocino la cena.", answer:"te", full:"Te cocino la cena."},
+  {cue:"a él", sentence:"___ doy un regalo.", answer:"le", full:"Le doy un regalo."},
+  {cue:"a ella", sentence:"___ escriben una carta.", answer:"le", full:"Le escriben una carta."},
+  {cue:"a nosotros", sentence:"___ explican el problema.", answer:"nos", full:"Nos explican el problema."},
+  {cue:"a nosotras", sentence:"___ traen café.", answer:"nos", full:"Nos traen café."},
+  {cue:"a vosotros", sentence:"___ preparo café.", answer:"os", full:"Os preparo café."},
+  {cue:"a vosotras", sentence:"___ mandan un mensaje.", answer:"os", full:"Os mandan un mensaje."},
+  {cue:"a ellos", sentence:"___ venden un coche.", answer:"les", full:"Les venden un coche."},
+  {cue:"a ellas", sentence:"___ hacen un favor.", answer:"les", full:"Les hacen un favor."},
+  {cue:"a mí", sentence:"___ buscan una solución.", answer:"me", full:"Me buscan una solución."},
+  {cue:"a ti", sentence:"___ cuentan una historia.", answer:"te", full:"Te cuentan una historia."},
+  {cue:"a él", sentence:"___ compramos un libro.", answer:"le", full:"Le compramos un libro."},
+  {cue:"a ella", sentence:"___ preparo un té.", answer:"le", full:"Le preparo un té."},
+  {cue:"a nosotros", sentence:"___ pagan la comida.", answer:"nos", full:"Nos pagan la comida."},
+  {cue:"a ellos", sentence:"___ enseño la casa.", answer:"les", full:"Les enseño la casa."}
+];
+
+let currentPronoun=null;
+let pronounScore=0, pronounAttempts=0;
+
+function nextPronoun(){
+  currentPronoun=pronounData[Math.floor(Math.random()*pronounData.length)];
+  document.getElementById('pronounQuestion').innerHTML='<strong>'+currentPronoun.cue+'</strong>: '+currentPronoun.sentence;
+  document.getElementById('pronounFeedback').textContent='';
+  document.getElementById('pronounFeedback').className='feedback';
+  renderOptions('pronounOptions', ["me","te","le","nos","os","les"], checkPronoun);
+}
+
+function checkPronoun(opt){
+  pronounAttempts++;
+  disableOptions('#pronounOptions');
+  const fb=document.getElementById('pronounFeedback');
+  if(opt===currentPronoun.answer){
+    pronounScore++;
+    fb.textContent='✅ Correct: '+currentPronoun.full;
+    fb.className='feedback good';
+  }else{
+    fb.textContent='❌ Correct answer: '+currentPronoun.full;
+    fb.className='feedback bad';
+  }
+  document.getElementById('pronounStats').textContent='Score: '+pronounScore+' / '+pronounAttempts;
+}
+
+function resetPronouns(){
+  pronounScore=0; pronounAttempts=0;
+  document.getElementById('pronounStats').textContent='Score: 0 / 0';
+  nextPronoun();
+}
+
+/* ---------------- TAB 2: VERB FORMS + INDIRECT PRONOUNS ---------------- */
+
+const verbPronounData=[
+  {tense:"Present", prompt:"(Yo) Les _______ la cena.", answer:"cocino", options:["cocino","cocinas","cocina"], full:"Les cocino la cena."},
+  {tense:"Present", prompt:"(Tú) Me _______ un café.", answer:"preparas", options:["preparo","preparas","prepara"], full:"Me preparas un café."},
+  {tense:"Present", prompt:"(Él) Te _______ una historia.", answer:"cuenta", options:["cuento","cuentas","cuenta"], full:"Te cuenta una historia."},
+  {tense:"Present", prompt:"(Ella) Nos _______ el problema.", answer:"explica", options:["explico","explicas","explica"], full:"Nos explica el problema."},
+  {tense:"Present", prompt:"(Nosotros) Le _______ una carta.", answer:"escribimos", options:["escribo","escribimos","escriben"], full:"Le escribimos una carta."},
+  {tense:"Present", prompt:"(Vosotros) Les _______ mucho.", answer:"ayudáis", options:["ayudo","ayudáis","ayudan"], full:"Les ayudáis mucho."},
+  {tense:"Present", prompt:"(Ellos) Me _______ un favor.", answer:"hacen", options:["hago","haces","hacen"], full:"Me hacen un favor."},
+  {tense:"Present", prompt:"(Ellas) Te _______ la verdad.", answer:"dicen", options:["digo","dices","dicen"], full:"Te dicen la verdad."},
+
+  {tense:"Pretérito perfecto", prompt:"(Yo) Les _______ hecho un pastel.", answer:"he", options:["he","has","ha"], full:"Les he hecho un pastel."},
+  {tense:"Pretérito perfecto", prompt:"(Tú) Me _______ preparado un café.", answer:"has", options:["he","has","ha"], full:"Me has preparado un café."},
+  {tense:"Pretérito perfecto", prompt:"(Él) Te _______ contado una historia.", answer:"ha", options:["he","has","ha"], full:"Te ha contado una historia."},
+  {tense:"Pretérito perfecto", prompt:"(Ella) Nos _______ explicado el problema.", answer:"ha", options:["he","has","ha"], full:"Nos ha explicado el problema."},
+  {tense:"Pretérito perfecto", prompt:"(Nosotros) Le _______ escrito una carta.", answer:"hemos", options:["he","hemos","han"], full:"Le hemos escrito una carta."},
+  {tense:"Pretérito perfecto", prompt:"(Vosotros) Les _______ ayudado mucho.", answer:"habéis", options:["has","habéis","han"], full:"Les habéis ayudado mucho."},
+  {tense:"Pretérito perfecto", prompt:"(Ellos) Me _______ hecho un favor.", answer:"han", options:["ha","habéis","han"], full:"Me han hecho un favor."},
+  {tense:"Pretérito perfecto", prompt:"(Ellas) Te _______ dicho la verdad.", answer:"han", options:["ha","habéis","han"], full:"Te han dicho la verdad."},
+
+  {tense:"Future: ir a + infinitive", prompt:"(Yo) Les _______ preparar la cena.", answer:"voy a", options:["voy a","vas a","va a"], full:"Les voy a preparar la cena."},
+  {tense:"Future: ir a + infinitive", prompt:"(Tú) Me _______ cocinar una pizza.", answer:"vas a", options:["voy a","vas a","va a"], full:"Me vas a cocinar una pizza."},
+  {tense:"Future: ir a + infinitive", prompt:"(Él) Te _______ contar una historia.", answer:"va a", options:["voy a","vas a","va a"], full:"Te va a contar una historia."},
+  {tense:"Future: ir a + infinitive", prompt:"(Ella) Nos _______ explicar el problema.", answer:"va a", options:["voy a","vas a","va a"], full:"Nos va a explicar el problema."},
+  {tense:"Future: ir a + infinitive", prompt:"(Nosotros) Te _______ visitar en noviembre.", answer:"vamos a", options:["voy a","vamos a","van a"], full:"Te vamos a visitar en noviembre."},
+  {tense:"Future: ir a + infinitive", prompt:"(Vosotros) Les _______ mandar un mensaje.", answer:"vais a", options:["vas a","vais a","van a"], full:"Les vais a mandar un mensaje."},
+  {tense:"Future: ir a + infinitive", prompt:"(Ellos) Me _______ hacer un favor.", answer:"van a", options:["va a","vais a","van a"], full:"Me van a hacer un favor."},
+  {tense:"Future: ir a + infinitive", prompt:"(Ellas) Le _______ comprar un regalo.", answer:"van a", options:["va a","vais a","van a"], full:"Le van a comprar un regalo."}
+];
+
+let currentVerbPronoun=null;
+let verbPronounScore=0, verbPronounAttempts=0;
+
+function nextVerbPronoun(){
+  currentVerbPronoun=verbPronounData[Math.floor(Math.random()*verbPronounData.length)];
+  document.getElementById('verbPronounLabel').textContent='Tense: '+currentVerbPronoun.tense;
+  document.getElementById('verbPronounQuestion').textContent=currentVerbPronoun.prompt;
+  document.getElementById('verbPronounFeedback').textContent='';
+  document.getElementById('verbPronounFeedback').className='feedback';
+  renderOptions('verbPronounOptions', currentVerbPronoun.options, checkVerbPronoun);
+}
+
+function checkVerbPronoun(opt){
+  verbPronounAttempts++;
+  disableOptions('#verbPronounOptions');
+  const fb=document.getElementById('verbPronounFeedback');
+  if(opt===currentVerbPronoun.answer){
+    verbPronounScore++;
+    fb.textContent='✅ Correct: '+currentVerbPronoun.full;
+    fb.className='feedback good';
+  }else{
+    fb.textContent='❌ Correct answer: '+currentVerbPronoun.full;
+    fb.className='feedback bad';
+  }
+  document.getElementById('verbPronounStats').textContent='Score: '+verbPronounScore+' / '+verbPronounAttempts;
+}
+
+function resetVerbPronouns(){
+  verbPronounScore=0; verbPronounAttempts=0;
+  document.getElementById('verbPronounStats').textContent='Score: 0 / 0';
+  nextVerbPronoun();
+}
+
+/* ---------------- TAB 3: TRANSLATE INDIRECT ---------------- */
+
+const translateData=[
+  {tense:"Present", english:"They make dinner for me.", gap:"___ ____ la cena.", answer:"Me/hacen", options:["Me/hacen","Te/hacen","Le/hacen","Les/hacen"], full:"Me hacen la cena."},
+  {tense:"Present", english:"I cook dinner for them.", gap:"___ ____ la cena.", answer:"Les/cocino", options:["Me/cocino","Te/cocino","Le/cocino","Les/cocino"], full:"Les cocino la cena."},
+  {tense:"Present", english:"She explains the problem to us.", gap:"___ ____ el problema.", answer:"Nos/explica", options:["Me/explica","Te/explica","Nos/explica","Les/explica"], full:"Nos explica el problema."},
+  {tense:"Present", english:"We write a letter to him.", gap:"___ ____ una carta.", answer:"Le/escribimos", options:["Me/escribimos","Te/escribimos","Le/escribimos","Les/escribimos"], full:"Le escribimos una carta."},
+  {tense:"Present", english:"You tell me the truth.", gap:"___ ____ la verdad.", answer:"Me/dices", options:["Me/dices","Te/dices","Le/dices","Nos/dices"], full:"Me dices la verdad."},
+  {tense:"Present", english:"They buy a present for her.", gap:"___ ____ un regalo.", answer:"Le/compran", options:["Me/compran","Te/compran","Le/compran","Les/compran"], full:"Le compran un regalo."},
+  {tense:"Present", english:"My mother makes breakfast for me.", gap:"___ ____ el desayuno.", answer:"Me/hace", options:["Me/hace","Te/hace","Le/hace","Les/hace"], full:"Me hace el desayuno."},
+  {tense:"Present", english:"I buy flowers for her.", gap:"___ ____ flores.", answer:"Le/compro", options:["Me/compro","Te/compro","Le/compro","Les/compro"], full:"Le compro flores."},
+  {tense:"Present", english:"They bring water to us.", gap:"___ ____ agua.", answer:"Nos/traen", options:["Me/traen","Te/traen","Nos/traen","Les/traen"], full:"Nos traen agua."},
+  {tense:"Present", english:"We prepare tea for you.", gap:"___ ____ té.", answer:"Te/preparamos", options:["Me/preparamos","Te/preparamos","Le/preparamos","Les/preparamos"], full:"Te preparamos té."},
+  {tense:"Present", english:"She sends messages to them.", gap:"___ ____ mensajes.", answer:"Les/manda", options:["Me/manda","Te/manda","Le/manda","Les/manda"], full:"Les manda mensajes."},
+
+  {tense:"Pretérito perfecto", english:"They have made a cake for me.", gap:"___ ____ hecho un pastel.", answer:"Me/han", options:["Te/han","Le/han","Me/han","Les/han"], full:"Me han hecho un pastel."},
+  {tense:"Pretérito perfecto", english:"I have prepared coffee for them.", gap:"___ ____ preparado café.", answer:"Les/he", options:["Me/he","Te/he","Le/he","Les/he"], full:"Les he preparado café."},
+  {tense:"Pretérito perfecto", english:"She has explained the problem to us.", gap:"___ ____ explicado el problema.", answer:"Nos/ha", options:["Me/ha","Te/ha","Nos/ha","Les/ha"], full:"Nos ha explicado el problema."},
+  {tense:"Pretérito perfecto", english:"We have written a letter to him.", gap:"___ ____ escrito una carta.", answer:"Le/hemos", options:["Me/hemos","Te/hemos","Le/hemos","Les/hemos"], full:"Le hemos escrito una carta."},
+  {tense:"Pretérito perfecto", english:"You have told me a story.", gap:"___ ____ contado una historia.", answer:"Me/has", options:["Me/has","Te/has","Le/has","Nos/has"], full:"Me has contado una historia."},
+  {tense:"Pretérito perfecto", english:"They have bought a present for her.", gap:"___ ____ comprado un regalo.", answer:"Le/han", options:["Me/han","Te/han","Le/han","Les/han"], full:"Le han comprado un regalo."},
+  {tense:"Pretérito perfecto", english:"I have bought a book for you.", gap:"___ ____ comprado un libro.", answer:"Te/he", options:["Me/he","Te/he","Le/he","Les/he"], full:"Te he comprado un libro."},
+  {tense:"Pretérito perfecto", english:"They have prepared dinner for us.", gap:"___ ____ preparado la cena.", answer:"Nos/han", options:["Me/han","Te/han","Nos/han","Les/han"], full:"Nos han preparado la cena."},
+  {tense:"Pretérito perfecto", english:"She has sent an email to him.", gap:"___ ____ mandado un email.", answer:"Le/ha", options:["Me/ha","Te/ha","Le/ha","Les/ha"], full:"Le ha mandado un email."},
+  {tense:"Pretérito perfecto", english:"We have made breakfast for them.", gap:"___ ____ hecho el desayuno.", answer:"Les/hemos", options:["Me/hemos","Te/hemos","Le/hemos","Les/hemos"], full:"Les hemos hecho el desayuno."},
+  {tense:"Pretérito perfecto", english:"You have brought water to me.", gap:"___ ____ traído agua.", answer:"Me/has", options:["Me/has","Te/has","Le/has","Nos/has"], full:"Me has traído agua."},
+
+  {tense:"Future: ir a + infinitive", english:"We are going to visit you in November.", gap:"___ ____ visitar en noviembre.", answer:"Te/vamos a", options:["Me/vamos a","Te/vamos a","Le/vamos a","Les/vamos a"], full:"Te vamos a visitar en noviembre."},
+  {tense:"Future: ir a + infinitive", english:"I am going to cook dinner for them.", gap:"___ ____ cocinar la cena.", answer:"Les/voy a", options:["Me/voy a","Te/voy a","Le/voy a","Les/voy a"], full:"Les voy a cocinar la cena."},
+  {tense:"Future: ir a + infinitive", english:"She is going to explain the problem to us.", gap:"___ ____ explicar el problema.", answer:"Nos/va a", options:["Me/va a","Te/va a","Nos/va a","Les/va a"], full:"Nos va a explicar el problema."},
+  {tense:"Future: ir a + infinitive", english:"They are going to make a cake for me.", gap:"___ ____ hacer un pastel.", answer:"Me/van a", options:["Me/van a","Te/van a","Le/van a","Les/van a"], full:"Me van a hacer un pastel."},
+  {tense:"Future: ir a + infinitive", english:"You are going to send a message to her.", gap:"___ ____ mandar un mensaje.", answer:"Le/vas a", options:["Me/vas a","Te/vas a","Le/vas a","Les/vas a"], full:"Le vas a mandar un mensaje."},
+  {tense:"Future: ir a + infinitive", english:"We are going to buy a present for them.", gap:"___ ____ comprar un regalo.", answer:"Les/vamos a", options:["Me/vamos a","Te/vamos a","Le/vamos a","Les/vamos a"], full:"Les vamos a comprar un regalo."},
+  {tense:"Future: ir a + infinitive", english:"I am going to send a message to you.", gap:"___ ____ mandar un mensaje.", answer:"Te/voy a", options:["Me/voy a","Te/voy a","Le/voy a","Les/voy a"], full:"Te voy a mandar un mensaje."},
+  {tense:"Future: ir a + infinitive", english:"They are going to prepare dinner for us.", gap:"___ ____ preparar la cena.", answer:"Nos/van a", options:["Me/van a","Te/van a","Nos/van a","Les/van a"], full:"Nos van a preparar la cena."},
+  {tense:"Future: ir a + infinitive", english:"She is going to buy flowers for her.", gap:"___ ____ comprar flores.", answer:"Le/va a", options:["Me/va a","Te/va a","Le/va a","Les/va a"], full:"Le va a comprar flores."},
+  {tense:"Future: ir a + infinitive", english:"We are going to bring coffee to them.", gap:"___ ____ traer café.", answer:"Les/vamos a", options:["Me/vamos a","Te/vamos a","Le/vamos a","Les/vamos a"], full:"Les vamos a traer café."},
+  {tense:"Future: ir a + infinitive", english:"You are going to make a cake for me.", gap:"___ ____ hacer un pastel.", answer:"Me/vas a", options:["Me/vas a","Te/vas a","Le/vas a","Nos/vas a"], full:"Me vas a hacer un pastel."}
+];
+
+let currentTranslate=null, lastTranslateIndex=-1;
+let translateScore=0, translateAttempts=0;
+
+function nextTranslate(){
+  const idx=pickNextIndex(translateData, lastTranslateIndex);
+  lastTranslateIndex=idx;
+  currentTranslate=translateData[idx];
+  document.getElementById('translateLabel').textContent='Tense: '+currentTranslate.tense;
+  document.getElementById('translatePrompt').textContent=currentTranslate.english;
+  document.getElementById('translateGap').textContent=currentTranslate.gap;
+  document.getElementById('translateFeedback').textContent='';
+  document.getElementById('translateFeedback').className='feedback';
+  renderOptions('translateOptions', currentTranslate.options, checkTranslate);
+}
+
+function checkTranslate(opt){
+  translateAttempts++;
+  const fb=document.getElementById('translateFeedback');
+  if(opt===currentTranslate.answer){
+    translateScore++;
+    disableOptions('#translateOptions');
+    fb.textContent='✅ Correct: '+currentTranslate.full;
+    fb.className='feedback good';
+    document.getElementById('translateStats').textContent='Score: '+translateScore+' / '+translateAttempts;
+    setTimeout(nextTranslate, 900);
+  }else{
+    fb.textContent='❌ Try again';
+    fb.className='feedback bad';
+    document.getElementById('translateStats').textContent='Score: '+translateScore+' / '+translateAttempts;
+  }
+}
+
+function resetTranslate(){
+  translateScore=0; translateAttempts=0; lastTranslateIndex=-1;
+  document.getElementById('translateStats').textContent='Score: 0 / 0';
+  nextTranslate();
+}
+
+/* ---------------- TAB 4: DIRECT PRONOUNS ---------------- */
+
+const directData=[
+  {object:"el coche", prompt:"(Yo) ___ compro.", answer:"lo", full:"Lo compro."},
+  {object:"la casa", prompt:"(Tú) ___ vendes.", answer:"la", full:"La vendes."},
+  {object:"los libros", prompt:"(Él) ___ lee.", answer:"los", full:"Los lee."},
+  {object:"las flores", prompt:"(Ella) ___ compra.", answer:"las", full:"Las compra."},
+  {object:"el problema", prompt:"(Nosotros) ___ entendemos.", answer:"lo", full:"Lo entendemos."},
+  {object:"la respuesta", prompt:"(Vosotros) ___ sabéis.", answer:"la", full:"La sabéis."},
+  {object:"los mensajes", prompt:"(Ellos) ___ mandan.", answer:"los", full:"Los mandan."},
+  {object:"las cartas", prompt:"(Ellas) ___ escriben.", answer:"las", full:"Las escriben."},
+  {object:"a Juan", prompt:"(Yo) ___ veo.", answer:"lo", full:"Lo veo."},
+  {object:"a María", prompt:"(Tú) ___ llamas.", answer:"la", full:"La llamas."},
+  {object:"a mis amigos", prompt:"(Ella) ___ visita.", answer:"los", full:"Los visita."},
+  {object:"a mis hermanas", prompt:"(Nosotros) ___ esperamos.", answer:"las", full:"Las esperamos."},
+  {object:"el café", prompt:"(Ellos) ___ preparan.", answer:"lo", full:"Lo preparan."},
+  {object:"la cena", prompt:"(Yo) ___ cocino.", answer:"la", full:"La cocino."},
+  {object:"los ejercicios", prompt:"(Tú) ___ haces.", answer:"los", full:"Los haces."},
+  {object:"las preguntas", prompt:"(Él) ___ responde.", answer:"las", full:"Las responde."},
+  {object:"el regalo", prompt:"(Nosotros) ___ compramos.", answer:"lo", full:"Lo compramos."},
+  {object:"la película", prompt:"(Vosotros) ___ veis.", answer:"la", full:"La veis."},
+  {object:"los zapatos", prompt:"(Ellas) ___ quieren comprar.", answer:"los", full:"Los quieren comprar."},
+  {object:"las llaves", prompt:"(Yo) ___ voy a buscar.", answer:"las", full:"Las voy a buscar."},
+  {object:"el email", prompt:"(Tú) ___ has mandado.", answer:"lo", full:"Lo has mandado."},
+  {object:"la pizza", prompt:"(Ella) ___ ha preparado.", answer:"la", full:"La ha preparado."},
+  {object:"los platos", prompt:"(Nosotros) ___ hemos limpiado.", answer:"los", full:"Los hemos limpiado."},
+  {object:"las ventanas", prompt:"(Ellos) ___ han abierto.", answer:"las", full:"Las han abierto."}
+];
+
+let currentDirect=null, lastDirectIndex=-1;
+let directScore=0, directAttempts=0;
+
+function nextDirect(){
+  const idx=pickNextIndex(directData, lastDirectIndex);
+  lastDirectIndex=idx;
+  currentDirect=directData[idx];
+  document.getElementById('directContext').innerHTML='Object: <strong>'+currentDirect.object+'</strong>';
+  document.getElementById('directQuestion').textContent=currentDirect.prompt;
+  document.getElementById('directFeedback').textContent='';
+  document.getElementById('directFeedback').className='feedback';
+  renderOptions('directOptions', ["lo","la","los","las"], checkDirect);
+}
+
+function checkDirect(opt){
+  directAttempts++;
+  const fb=document.getElementById('directFeedback');
+  if(opt===currentDirect.answer){
+    directScore++;
+    disableOptions('#directOptions');
+    fb.textContent='✅ Correct: '+currentDirect.full;
+    fb.className='feedback good';
+    document.getElementById('directStats').textContent='Score: '+directScore+' / '+directAttempts;
+    setTimeout(nextDirect, 900);
+  }else{
+    fb.textContent='❌ Try again';
+    fb.className='feedback bad';
+    document.getElementById('directStats').textContent='Score: '+directScore+' / '+directAttempts;
+  }
+}
+
+function resetDirect(){
+  directScore=0; directAttempts=0; lastDirectIndex=-1;
+  document.getElementById('directStats').textContent='Score: 0 / 0';
+  nextDirect();
+}
+
+/* ---------------- TAB 5: DOUBLE PRONOUNS SIMPLE ---------------- */
+
+const doubleData=[
+  {english:"I buy it for him.", gap:"___ ___ compro.", answer:"Se/lo", options:["Se/lo","Me/lo","Te/lo","Nos/lo"], full:"Se lo compro."},
+  {english:"I buy it for her.", gap:"___ ___ compro.", answer:"Se/lo", options:["Se/lo","Me/lo","Te/lo","Les/lo"], full:"Se lo compro."},
+  {english:"They explain it to us.", gap:"___ ___ explican.", answer:"Nos/lo", options:["Nos/lo","Nos/la","Me/lo","Se/lo"], full:"Nos lo explican."},
+  {english:"She gives it to me.", gap:"___ ___ da.", answer:"Me/lo", options:["Me/lo","Te/lo","Se/lo","Nos/lo"], full:"Me lo da."},
+  {english:"We send it to you.", gap:"___ ___ mandamos.", answer:"Te/lo", options:["Me/lo","Te/lo","Se/lo","Les/lo"], full:"Te lo mandamos."},
+  {english:"I tell it to you.", gap:"___ ___ digo.", answer:"Te/lo", options:["Me/lo","Te/lo","Se/lo","Nos/lo"], full:"Te lo digo."},
+  {english:"They send it to him.", gap:"___ ___ mandan.", answer:"Se/lo", options:["Se/lo","Le/lo","Te/lo","Nos/lo"], full:"Se lo mandan."},
+  {english:"She explains it to them.", gap:"___ ___ explica.", answer:"Se/lo", options:["Se/lo","Les/lo","Me/lo","Te/lo"], full:"Se lo explica."},
+
+  {english:"I buy them for her. (flowers)", gap:"___ ___ compro.", answer:"Se/las", options:["Se/las","Me/las","Te/las","Les/las"], full:"Se las compro."},
+  {english:"They bring them to us. (keys)", gap:"___ ___ traen.", answer:"Nos/las", options:["Nos/las","Nos/los","Se/las","Me/las"], full:"Nos las traen."},
+  {english:"We explain it to them. (the lesson)", gap:"___ ___ explicamos.", answer:"Se/la", options:["Se/la","Les/la","Te/la","Nos/la"], full:"Se la explicamos."},
+  {english:"You give them to me. (the books)", gap:"___ ___ das.", answer:"Me/los", options:["Me/los","Te/los","Se/los","Nos/los"], full:"Me los das."},
+  {english:"I prepare it for you. (dinner)", gap:"___ ___ preparo.", answer:"Te/la", options:["Me/la","Te/la","Se/la","Nos/la"], full:"Te la preparo."},
+  {english:"They buy them for us. (tickets)", gap:"___ ___ compran.", answer:"Nos/las", options:["Nos/las","Nos/los","Me/las","Se/las"], full:"Nos las compran."},
+  {english:"She reads it to me. (the letter)", gap:"___ ___ lee.", answer:"Me/la", options:["Me/la","Te/la","Se/la","Nos/la"], full:"Me la lee."},
+  {english:"We tell it to him. (the truth)", gap:"___ ___ decimos.", answer:"Se/la", options:["Se/la","Le/la","Te/la","Me/la"], full:"Se la decimos."},
+  {english:"I show them to her. (the photos)", gap:"___ ___ enseño.", answer:"Se/las", options:["Se/las","Le/las","Te/las","Nos/las"], full:"Se las enseño."},
+  {english:"They give them to you. (the papers)", gap:"___ ___ dan.", answer:"Te/los", options:["Me/los","Te/los","Se/los","Nos/los"], full:"Te los dan."}
+];
+
+let currentDouble=null, lastDoubleIndex=-1;
+let doubleScore=0, doubleAttempts=0;
+
+function nextDouble(){
+  const idx=pickNextIndex(doubleData, lastDoubleIndex);
+  lastDoubleIndex=idx;
+  currentDouble=doubleData[idx];
+  document.getElementById('doublePrompt').textContent=currentDouble.english;
+  document.getElementById('doubleGap').textContent=currentDouble.gap;
+  document.getElementById('doubleFeedback').textContent='';
+  document.getElementById('doubleFeedback').className='feedback';
+  renderOptions('doubleOptions', currentDouble.options, checkDouble);
+}
+
+function checkDouble(opt){
+  doubleAttempts++;
+  const fb=document.getElementById('doubleFeedback');
+  if(opt===currentDouble.answer){
+    doubleScore++;
+    disableOptions('#doubleOptions');
+    fb.textContent='✅ Correct: '+currentDouble.full;
+    fb.className='feedback good';
+    document.getElementById('doubleStats').textContent='Score: '+doubleScore+' / '+doubleAttempts;
+    setTimeout(nextDouble, 900);
+  }else{
+    fb.textContent='❌ Try again';
+    fb.className='feedback bad';
+    document.getElementById('doubleStats').textContent='Score: '+doubleScore+' / '+doubleAttempts;
+  }
+}
+
+function resetDouble(){
+  doubleScore=0; doubleAttempts=0; lastDoubleIndex=-1;
+  document.getElementById('doubleStats').textContent='Score: 0 / 0';
+  nextDouble();
+}
+
+/* ---------------- TAB 6: INFINITIVE ATTACHED PRONOUNS ---------------- */
+
+const infinitiveData=[
+  {type:"quiero + infinitive", english:"I want to buy it for him.", gap:"Quiero ________.", answer:"comprárselo", options:["comprárselo","comprártelo","comprármelo","comprárnoslo"], full:"Quiero comprárselo."},
+  {type:"voy a + infinitive", english:"I am going to buy it for her.", gap:"Voy a ________.", answer:"comprárselo", options:["comprárselo","comprártelo","comprármelo","comprárnoslo"], full:"Voy a comprárselo."},
+  {type:"quiero + infinitive", english:"I want to tell it to you.", gap:"Quiero ________.", answer:"decírtelo", options:["decírtelo","decírselo","decírmelo","decírnoslo"], full:"Quiero decírtelo."},
+  {type:"voy a + infinitive", english:"I am going to explain it to them.", gap:"Voy a ________.", answer:"explicárselo", options:["explicárselo","explicártelo","explicármelo","explicárnoslo"], full:"Voy a explicárselo."},
+  {type:"quiero + infinitive", english:"I want to give it to him.", gap:"Quiero ________.", answer:"dárselo", options:["dárselo","dártelo","dármelo","dárnoslo"], full:"Quiero dárselo."},
+  {type:"voy a + infinitive", english:"I am going to send it to you.", gap:"Voy a ________.", answer:"mandártelo", options:["mandártelo","mandárselo","mandármelo","mandárnoslo"], full:"Voy a mandártelo."},
+  {type:"quiero + infinitive", english:"I want to prepare it for you. (dinner)", gap:"Quiero ________.", answer:"preparártela", options:["preparártela","preparársela","preparármela","preparárnosla"], full:"Quiero preparártela."},
+  {type:"voy a + infinitive", english:"I am going to cook it for them. (dinner)", gap:"Voy a ________.", answer:"cocinársela", options:["cocinársela","cocinártela","cocinármela","cocinárnosla"], full:"Voy a cocinársela."},
+  {type:"quiero + infinitive", english:"I want to show them to her. (the photos)", gap:"Quiero ________.", answer:"enseñárselas", options:["enseñárselas","enseñártelas","enseñármelas","enseñárnoslas"], full:"Quiero enseñárselas."},
+  {type:"voy a + infinitive", english:"I am going to bring them to you. (the books)", gap:"Voy a ________.", answer:"traértelos", options:["traértelos","traérselos","traérmelos","traérnoslos"], full:"Voy a traértelos."},
+  {type:"quiero + infinitive", english:"I want to lend it to him. (the car)", gap:"Quiero ________.", answer:"prestárselo", options:["prestárselo","prestártelo","prestármelo","prestárnoslo"], full:"Quiero prestárselo."},
+  {type:"voy a + infinitive", english:"I am going to read it to you. (the letter)", gap:"Voy a ________.", answer:"leértela", options:["leértela","leérsela","leérmela","leérnosla"], full:"Voy a leértela."},
+  {type:"quiero + infinitive", english:"I want to explain it to him.", gap:"Quiero ________.", answer:"explicárselo", options:["explicárselo","explicártelo","explicárnoslo","explicármelo"], full:"Quiero explicárselo."},
+  {type:"voy a + infinitive", english:"I am going to tell it to you.", gap:"Voy a ________.", answer:"decírtelo", options:["decírtelo","decírselo","decírmelo","decírnoslo"], full:"Voy a decírtelo."},
+  {type:"quiero + infinitive", english:"I want to buy them for them. (tickets)", gap:"Quiero ________.", answer:"comprárselas", options:["comprárselas","comprártelas","comprármelas","comprárnoslas"], full:"Quiero comprárselas."},
+  {type:"voy a + infinitive", english:"I am going to give them to him. (the papers)", gap:"Voy a ________.", answer:"dárselos", options:["dárselos","dártelos","dármelos","dárnoslos"], full:"Voy a dárselos."},
+
+  {type:"present perfect", english:"I have bought it for him.", gap:"___ ___ he comprado.", answer:"Se/lo", options:["Se/lo","Me/lo","Te/lo","Nos/lo"], full:"Se lo he comprado."},
+  {type:"present perfect", english:"They have sent it to us.", gap:"___ ___ han mandado.", answer:"Nos/lo", options:["Nos/lo","Nos/la","Se/lo","Me/lo"], full:"Nos lo han mandado."},
+  {type:"present perfect", english:"She has explained it to me.", gap:"___ ___ ha explicado.", answer:"Me/lo", options:["Me/lo","Te/lo","Se/lo","Nos/lo"], full:"Me lo ha explicado."},
+  {type:"present perfect", english:"We have bought them for her. (flowers)", gap:"___ ___ hemos comprado.", answer:"Se/las", options:["Se/las","Le/las","Me/las","Nos/las"], full:"Se las hemos comprado."}
+  ,
+  {type:"voy a + infinitive", english:"We are going to explain it to him.", gap:"Vamos a ________.", answer:"explicárselo", options:["explicárselo","explicárnoslo","explicártelo","explicármelo"], full:"Vamos a explicárselo."},
+  {type:"voy a + infinitive", english:"She is going to send them to us. (the documents)", gap:"Va a ________.", answer:"mandárnoslos", options:["mandárnoslos","mandártelos","mandárselos","mandármelos"], full:"Va a mandárnoslos."},
+  {type:"quiero + infinitive", english:"We want to give it to you.", gap:"Queremos ________.", answer:"dártelo", options:["dártelo","dárnoslo","dárselo","dármelo"], full:"Queremos dártelo."},
+  {type:"voy a + infinitive", english:"They are going to show them to me. (the photos)", gap:"Van a ________.", answer:"enseñármelas", options:["enseñármelas","enseñárselas","enseñárnoslas","enseñártelas"], full:"Van a enseñármelas."},
+  {type:"quiero + infinitive", english:"She wants to bring it to us.", gap:"Quiere ________.", answer:"traérnoslo", options:["traérnoslo","traértelo","traérselo","traérmelo"], full:"Quiere traérnoslo."},
+  {type:"voy a + infinitive", english:"You are going to read them to her. (the emails)", gap:"Vas a ________.", answer:"leérselos", options:["leérselos","leértelos","leérnoslos","leérmelos"], full:"Vas a leérselos."},
+  {type:"present perfect", english:"We have explained it to you.", gap:"___ ___ hemos explicado.", answer:"Te/lo", options:["Te/lo","Me/lo","Se/lo","Nos/lo"], full:"Te lo hemos explicado."},
+  {type:"present perfect", english:"I have sent them to her. (the files)", gap:"___ ___ he enviado.", answer:"Se/los", options:["Se/los","Le/los","Te/los","Me/los"], full:"Se los he enviado."},
+  {type:"present perfect", english:"They have given it to us.", gap:"___ ___ han dado.", answer:"Nos/lo", options:["Nos/lo","Nos/la","Se/lo","Me/lo"], full:"Nos lo han dado."},
+  {type:"quiero + infinitive", english:"I want to buy it for him.", gap:"Quiero ________.", answer:"comprárselo", options:["comprárselo","comprártelo","comprármelo","comprárnoslo"], full:"Quiero comprárselo."}
+
+];
+
+let currentInfinitive=null, lastInfinitiveIndex=-1;
+let infinitiveScore=0, infinitiveAttempts=0;
+
+function nextInfinitive(){
+  const idx=pickNextIndex(infinitiveData, lastInfinitiveIndex);
+  lastInfinitiveIndex=idx;
+  currentInfinitive=infinitiveData[idx];
+  document.getElementById('infinitiveLabel').textContent='Structure: '+currentInfinitive.type;
+  document.getElementById('infinitivePrompt').textContent=currentInfinitive.english;
+  document.getElementById('infinitiveGap').textContent=currentInfinitive.gap;
+  document.getElementById('infinitiveFeedback').textContent='';
+  document.getElementById('infinitiveFeedback').className='feedback';
+  renderOptions('infinitiveOptions', currentInfinitive.options, checkInfinitive);
+}
+
+function checkInfinitive(opt){
+  infinitiveAttempts++;
+  const fb=document.getElementById('infinitiveFeedback');
+  if(opt===currentInfinitive.answer){
+    infinitiveScore++;
+    disableOptions('#infinitiveOptions');
+    fb.textContent='✅ Correct: '+currentInfinitive.full;
+    fb.className='feedback good';
+    document.getElementById('infinitiveStats').textContent='Score: '+infinitiveScore+' / '+infinitiveAttempts;
+    setTimeout(nextInfinitive, 900);
+  }else{
+    fb.textContent='❌ Try again';
+    fb.className='feedback bad';
+    document.getElementById('infinitiveStats').textContent='Score: '+infinitiveScore+' / '+infinitiveAttempts;
+  }
+}
+
+function resetInfinitive(){
+  infinitiveScore=0; infinitiveAttempts=0; lastInfinitiveIndex=-1;
+  document.getElementById('infinitiveStats').textContent='Score: 0 / 0';
+  nextInfinitive();
+}
+
+nextPronoun();
+</script>
+</body>
+</html>
